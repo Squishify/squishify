@@ -10,7 +10,7 @@
 
         bundle install
 
-3. Run your database migrations.
+3. Run your database migrations:
 
 		rake db:migrate
 
