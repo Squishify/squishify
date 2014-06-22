@@ -86,8 +86,16 @@
                     .addClass("squishifySection")
                     .appendTo($articleContent);
 
+                //Temporary hack
+                var sectionTitleMatches = section.name.match(/:/);
+                var sectionTitleDepth = (sectionTitleMatches == null)?0:sectionTitleMatches.length;
+                console.log(section.name);
+                sectionTitle = section.name;
+                if(sectionTitleDepth > 0)
+                    var sectionTitle = section.name.slice(section.name.lastIndexOf(":"));
+
                 var $sectionTitle = $("<h2>")
-                    .text(section.name)
+                    .text(sectionTitle)
                     .appendTo($section);
 
                 for(var y in section.paragraphs) {
