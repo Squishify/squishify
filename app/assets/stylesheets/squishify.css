@@ -60,6 +60,11 @@ body {
 	clear: both;
 	line-height: 1.3em;
 }
+.squishifyArticle .squishifyArticle-content h3, .squishifyArticle .squishifyArticle-content h4 {
+	clear: both;
+	line-height: 1.3em;
+	margin: 0 20px;
+}
 .squishifyArticle .squishifyArticle-content .squishifyParagraph{
 	margin: 20px;
 	cursor: pointer;
