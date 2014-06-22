@@ -5,43 +5,47 @@ task :import => [:environment] do
 
   article = Article.create({
     :title => "Protecting and Promoting the Open Internet NPRM"
-  })
+  }) 
 
-  section_introduction = Section.create({
-    :name => 'INTRODUCTION',
-    :rank => 0,
-    :article_id => article.id
-  })  
+  header_rank = 0
+  seen_section_heads = []
+  CSV.foreach('lib/assets/data.csv', :headers => true) do |row|
 
-  section_background = Section.create({
-    :name => 'BACKGROUND',
-    :rank => 1,
-    :article_id => article.id
-  })
+    section_name = row['Section_Name']
+    header_name = row['Header']
+    sub_header_name = row['Sub_Header']
+    sub_sub_header_name = row['Sub_sub_head']
 
-  section_discussion = Section.create({
-    :name => 'DISCUSSION',
-    :rank => 2,
-    :article_id => article.id
-  })
+    if header_name
+      section_name += ":" + header_name
+      if sub_header_name
+        section_name += ":" + sub_header_name
+        if sub_sub_header_name
+          section_name += ":" + sub_sub_header_name
+        end
+      end
+    end
 
-  section_procedural = Section.create({
-    :name => 'PROCEDURAL MATTERS',
-    :rank => 3,
-    :article_id => article.id
-  })
+    if seen_section_heads.include?(section_name)
+    else
+      Section.create({
+        :name => section_name,
+        :rank => header_rank,
+        :article_id => article.id
+      }) 
 
-  section_ordering = Section.create({
-    :name => 'ORDERING CLAUSES',
-    :rank => 4,
-    :article_id => article.id
-  })
+      seen_section_heads << section_name
+    end
+
+    header_rank += 1
+  end
 
   rank = 0
   seen_tags = []
-  CSV.foreach('lib/assets/data.csv', :headers => true, :encoding => 'ISO-8859-1:UTF-8') do |row|
+  seen_section_heads = []
+  CSV.foreach('lib/assets/data.csv', :headers => true) do |row|
 
-    section_id = Section.where('name=?', row['Section_Name']).first.id
+    section_id = Section.where('name like ?', "%"+row['Section_Name']+"%").first.id
 
     p = Paragraph.create ({
       :content => row['Paragraph'],
