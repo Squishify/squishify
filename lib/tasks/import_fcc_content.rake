@@ -1,4 +1,4 @@
-require 'CSV'
+require 'csv'
 
 desc "Import data from csv file"
 task :import => [:environment] do
@@ -9,7 +9,7 @@ task :import => [:environment] do
 
   header_rank = 0
   seen_section_heads = []
-  CSV.foreach('lib/assets/data.csv', :headers => true) do |row|
+  csv.foreach('lib/assets/data.csv', :headers => true) do |row|
 
     section_name = row['Section_Name']
     header_name = row['Header']
@@ -43,7 +43,7 @@ task :import => [:environment] do
   rank = 0
   seen_tags = []
   seen_section_heads = []
-  CSV.foreach('lib/assets/data.csv', :headers => true) do |row|
+  csv.foreach('lib/assets/data.csv', :headers => true) do |row|
 
     section_name = row['Section_Name']
     header_name = row['Header']
