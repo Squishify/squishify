@@ -45,7 +45,22 @@ task :import => [:environment] do
   seen_section_heads = []
   CSV.foreach('lib/assets/data.csv', :headers => true) do |row|
 
-    section_id = Section.where('name like ?', "%"+row['Section_Name']+"%").first.id
+    section_name = row['Section_Name']
+    header_name = row['Header']
+    sub_header_name = row['Sub_Header']
+    sub_sub_header_name = row['Sub_sub_head']
+
+    if header_name
+      section_name += ":" + header_name
+      if sub_header_name
+        section_name += ":" + sub_header_name
+        if sub_sub_header_name
+          section_name += ":" + sub_sub_header_name
+        end
+      end
+    end
+
+    section_id = Section.where('name=?', section_name).first.id
 
     p = Paragraph.create ({
       :content => row['Paragraph'],
