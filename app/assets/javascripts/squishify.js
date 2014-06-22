@@ -57,6 +57,7 @@
 
             var $filterInput = $("<input>")
                 .attr("type", "text")
+                .attr("placeholder", "Search for a term")
                 .keyup(function(e) {
                     var text = $(this).val();
                     self.filterSentences(self.filters.concat([text]));
