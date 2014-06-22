@@ -89,12 +89,12 @@
                 //Temporary hack
                 var sectionTitleMatches = section.name.match(/:/);
                 var sectionTitleDepth = (sectionTitleMatches == null)?0:sectionTitleMatches.length;
-                console.log(section.name);
+
                 sectionTitle = section.name;
                 if(sectionTitleDepth > 0)
-                    var sectionTitle = section.name.slice(section.name.lastIndexOf(":"));
+                    var sectionTitle = section.name.slice(section.name.lastIndexOf(":") + 1);
 
-                var $sectionTitle = $("<h2>")
+                var $sectionTitle = $("<h" + (sectionTitleDepth + 2) + ">")
                     .text(sectionTitle)
                     .appendTo($section);
 
