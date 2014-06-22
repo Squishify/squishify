@@ -3,7 +3,7 @@
 
     var pluginName = "squishify",
         defaults = {
-          server: "squishify.com",
+          server: "",
           article_id: 0
         };
 
@@ -20,33 +20,17 @@
             var self = this;
             self.paragraphs = [];
             self.filters = [];
-            self.renderArticle({
-                id: 1,
-                sections: [{
-                    id:1,
-                    title: "Section ONE",
-                    paragraphs: [{
-                        id:1,
-                        content: "The Internet is America’s most important platform for economic growth, innovation, competition, free expression, and broadband investment and deployment. As a “general purpose technology,” the Internet has been, and remains to date, the preeminent 21st century engine for innovation and the economic and social benefits that follow. These benefits flow, in large part, from the open, end-to-end architecture of the Internet, which is characterized by low barriers to entry for developers of new content, applications, services, and devices and a consumer-demand-driven marketplace for their products. As the Commission explained in its 2010 Open Internet Order, the Internet’s open architecture allows innovators and consumers at the edges of the network “to create and determine the success or failure of content, applications, services and devices,” without requiring permission from the broadband provider to reach end users.1 As an open platform, it fosters diversity and it enables people to build communities.",
-                        summary: "The open architecture of the Internet, the 21st century's engine for innovation, allows innovators and consumers to create content and applications, without requiring permission from broadband providers.",
-                        tags: ["internet", "architecture", "consumer", "barrier", "technology", "innovator", "consumer", "diversity", "community", "economic", "innovation", "competition", "free expression"]
-                    },
-                    {
-                        id:2,
-                        content: "We start with a fundamental question: What is the right public policy to ensure that the Internet remains open? This Notice of Proposed Rulemaking (Notice), and the comment process that follows, will turn on this fundamental question. ",
-                        summary: "What is the right public policy to ensure that the Internet remains open?",
-                        tags: ["open", "comment", "internet"]
-                    }]
-                },{
-                    id:2,
-                    title: "Section TWO",
-                    paragraphs: [{
-                        id:3,
-                        content: "Today, there are no legally enforceable rules by which the Commission can stop broadband providers from limiting Internet openness. This Notice begins the process of closing that gap, by proposing to reinstitute the no-blocking rule adopted in 2010 and creating a new rule that would bar commercially unreasonable actions from threatening Internet openness (as well as enhancing the transparency rule that is currently in effect). ",
-                        summary: "This begins the process of reinstituting the no-block rule and creating a new rule to bar actions that threaten Internet openness.",
-                        tags: ["no-block rule", "notice", "commission", "broadband", "2010", "rule", "openness"]
-                    }]
-                },]
+            $.ajax({
+                url: self.settings.server + "/articles/" + self.settings.article_id + ".json",
+                dataType: "json"
+            })
+            .done(function(data) {
+                self.renderArticle(data);
+            })
+            .error(function(a,b,c) {
+                console.log(a);
+                console.log(b);
+                console.log(c);
             })
         },
 
@@ -56,12 +40,15 @@
          */
         renderArticle: function(article) {
             var self = this;
-
             var $article = $("<div>")
                 .attr("id", "squishfyArticle-" + article.id)
                 .addClass("squishifyArticle")
                 .hide()
                 .appendTo($(self.element));
+
+            var $title = $("<h1>")
+                .text(article.title)
+                .appendTo($article);
 
             var $filter = $("<div>")
                 .attr("id", "squishifyFilter-" + article.id)
@@ -85,6 +72,11 @@
             var $filters = $("<ul>")
                 .appendTo($filter);
 
+
+            var $miniContent = $("<div>")
+                .addClass("squishifyArticle-mini")
+                .appendTo($article);
+
             var $articleContent = $("<div>")
                 .addClass("squishifyArticle-content")
                 .appendTo($article);
@@ -97,10 +89,10 @@
                     .attr("id","squishifySection-" + section.id)
                     .data("section_id", section.id)
                     .addClass("squishifySection")
-                    .appendTo($article);
+                    .appendTo($articleContent);
 
-                var $sectionTitle = $("<h1>")
-                    .text(section.title)
+                var $sectionTitle = $("<h2>")
+                    .text(section.name)
                     .appendTo($section);
 
                 for(var y in section.paragraphs) {
@@ -115,6 +107,22 @@
                                 self.collapseParagraph(paragraph_id);
                             else
                                 self.expandParagraph(paragraph_id);
+                        })
+                        .mouseenter(function() {
+                            var paragraph_id = $(this).data("paragraph_id");
+                            $("#squishifyParagraphaphMini-" + paragraph_id).addClass("hover");
+
+                            console.log($("#squishifyParagraphaphMini-" + paragraph_id).position().top)
+                            if($("#squishifyParagraphaphMini-" + paragraph_id).position().top < 0
+                            || $("#squishifyParagraphaphMini-" + paragraph_id).position().top > $miniContent.height()) {
+                                $miniContent.animate({
+                                    scrollTop: $("#squishifyParagraphaphMini-" + paragraph_id).position().top
+                                }, 100);
+                            }
+                        })
+                        .mouseleave(function() {
+                            var paragraph_id = $(this).data("paragraph_id");
+                            $("#squishifyParagraphaphMini-" + paragraph_id).removeClass("hover");
                         })
                         .appendTo($section);
 
@@ -131,7 +139,39 @@
                 }
             }
 
+            $(document).scroll(function() {
+                var scrollPosition = $(document).scrollTop();
+                var scrollPct = scrollPosition / $(document).height();
+                //$miniContent.scrollTop($miniContent[0].scrollHeight * scrollPct);
+            })
+
             $article.show();
+            self.renderMini();
+        },
+
+        renderMini: function() {
+            var self = this;
+            var $mini = $(self.element).find(".squishifyArticle-mini");
+            $mini.empty();
+            for(var x in self.paragraphs) {
+                var paragraph = self.paragraphs[x];
+                var $paragraph = $("<div>")
+                    .addClass("squishifyParagraph")
+                    .attr("id","squishifyParagraphaphMini-" + paragraph.id)
+                    .data("paragraph_id", paragraph.id)
+                    .text(paragraph.content)
+                    .click(function(e) {
+                        var paragraph_id = $(this).data("paragraph_id");
+                        $('body').animate({
+                            scrollTop: $("#squishifyParagraph-" + paragraph_id).offset().top
+                        }, 100);
+                    })
+                    .appendTo($mini);
+
+                var $bigParagraph = $("#squishifyParagraph-" + paragraph.id);
+                if(!$bigParagraph.is(":visible"))
+                    $paragraph.addClass("filtered")
+            }
         },
         
         /**
@@ -195,12 +235,14 @@
             }
 
             if(matches.length > 0) {
-                $(".squishifyParagraph").hide();
+                $(".squishifyArticle-content .squishifyParagraph").hide();
                 for(var x in matches)
                     $("#squishifyParagraph-" + matches[x].id).show();
             } else {
-                $(".squishifyParagraph").show();
+                $(".squishifyArticle-content .squishifyParagraph").show();
             }
+
+            self.renderMini();
         },
 
         /**
