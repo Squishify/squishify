@@ -1,4 +1,4 @@
-require 'CSV'
+require 'csv'
 
 desc "Import data from csv file"
 task :import => [:environment] do
