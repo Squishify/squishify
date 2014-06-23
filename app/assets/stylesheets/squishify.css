@@ -9,6 +9,18 @@
 body {
 	background: #fc0;
 }
+
+#explanation {
+	padding: 20px;
+	max-width: 1200px;
+	margin: auto;
+	text-align: center;
+}
+#explanation a {
+	color: #666;
+	text-decoration: none;
+}
+
 .squishifyArticle {
 	width: 90%;
 	max-width: 800px;
